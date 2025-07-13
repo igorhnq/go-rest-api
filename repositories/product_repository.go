@@ -44,3 +44,23 @@ func (p *ProductRepository) GetProducts() ([]models.Product, error) {
 
 	return productList, nil
 }
+
+func (pr *ProductRepository) CreateProduct(product models.Product) (int, error) {
+
+	var id int
+	query, err := pr.connection.Prepare("INSERT INTO products" +
+		"(nmproduct, vlprice)" +
+		"VALUES ($1, $2) RETURNING cdproduct")
+	if err != nil {
+		fmt.Println("Error preparing product: ", err)
+		return 0, err
+	}
+
+	err = query.QueryRow(product.Name, product.Price).Scan(&id)
+	if err != nil {
+		fmt.Println("Error creating product: ", err)
+		return 0, err
+	}
+
+	return id, nil
+}
