@@ -81,7 +81,7 @@ func (pr *ProductRepository) GetProductById(cdproduct int) (*models.Product, err
 	)
 
 	if err != nil {
-		if (err == sql.ErrNoRows) {
+		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 
@@ -90,4 +90,31 @@ func (pr *ProductRepository) GetProductById(cdproduct int) (*models.Product, err
 
 	query.Close()
 	return &product, nil
+}
+
+func (pr *ProductRepository) DeleteProductById(cdproduct int) error {
+	query, err := pr.connection.Prepare("DELETE FROM products WHERE cdproduct = $1")
+	if err != nil {
+		fmt.Println("Error preparing delete product: ", err)
+		return err
+	}
+
+	result, err := query.Exec(cdproduct)
+	if err != nil {
+		fmt.Println("Error deleting product: ", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		fmt.Println("Error getting rows affected: ", err)
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return nil
+	}
+
+	query.Close()
+	return nil
 }
