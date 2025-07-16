@@ -118,3 +118,30 @@ func (pr *ProductRepository) DeleteProductById(cdproduct int) error {
 	query.Close()
 	return nil
 }
+
+func (pr *ProductRepository) UpdateProduct(cdproduct int, product models.Product) error {
+	query, err := pr.connection.Prepare("UPDATE products SET nmproduct = $1, vlprice = $2 WHERE cdproduct = $3")
+	if err != nil {
+		fmt.Println("Error preparing update product: ", err)
+		return err
+	}
+
+	result, err := query.Exec(product.Name, product.Price, cdproduct)
+	if err != nil {
+		fmt.Println("Error updating product: ", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		fmt.Println("Error getting rows affected: ", err)
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return nil
+	}
+
+	query.Close()
+	return nil
+}
