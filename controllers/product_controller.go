@@ -9,17 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type productController struct {
+type ProductController struct {
 	productUseCase usecases.ProductUsecase
 }
 
-func NewProductController(usecases usecases.ProductUsecase) productController {
-	return productController{
+func NewProductController(usecases usecases.ProductUsecase) ProductController {
+	return ProductController{
 		productUseCase: usecases,
 	}
 }
 
-func (p *productController) GetProducts(ctx *gin.Context) {
+func (p *ProductController) GetProducts(ctx *gin.Context) {
 
 	products, err := p.productUseCase.GetProducts()
 	if err != nil {
@@ -29,7 +29,7 @@ func (p *productController) GetProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, products)
 }
 
-func (p *productController) CreateProduct(ctx *gin.Context) {
+func (p *ProductController) CreateProduct(ctx *gin.Context) {
 
 	var product models.Product
 	err := ctx.BindJSON(&product)
@@ -49,7 +49,7 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, insertedProduct)
 }
 
-func (p *productController) GetProductById(ctx *gin.Context) {
+func (p *ProductController) GetProductById(ctx *gin.Context) {
 
 	id := ctx.Param("cdproduct")
 
@@ -87,7 +87,7 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, product)
 }
 
-func (p *productController) DeleteProductById(ctx *gin.Context) {
+func (p *ProductController) DeleteProductById(ctx *gin.Context) {
 	id := ctx.Param("cdproduct")
 
 	if id == "" {
@@ -119,7 +119,7 @@ func (p *productController) DeleteProductById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (p *productController) UpdateProduct(ctx *gin.Context) {
+func (p *ProductController) UpdateProduct(ctx *gin.Context) {
 	id := ctx.Param("cdproduct")
 
 	if id == "" {

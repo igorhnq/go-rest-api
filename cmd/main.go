@@ -4,13 +4,13 @@ import (
 	"go-rest-api/controllers"
 	"go-rest-api/db"
 	"go-rest-api/repositories"
+	"go-rest-api/routes"
 	"go-rest-api/usecases"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-
 	server := gin.Default()
 
 	dbConnection, err := db.ConnectDB()
@@ -19,10 +19,8 @@ func main() {
 	}
 
 	ProductRepository := repositories.NewProductRepository(dbConnection)
-
 	ProductUseCase := usecases.NewProductUseCase(ProductRepository)
-
-	ProductControler := controllers.NewProductController(ProductUseCase)
+	ProductController := controllers.NewProductController(ProductUseCase)
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
@@ -30,11 +28,7 @@ func main() {
 		})
 	})
 
-	server.GET("/products", ProductControler.GetProducts)
-	server.POST("/products", ProductControler.CreateProduct)
-	server.GET("/products/:cdproduct", ProductControler.GetProductById)
-	server.PUT("/products/:cdproduct", ProductControler.UpdateProduct)
-	server.DELETE("/products/:cdproduct", ProductControler.DeleteProductById)
+	routes.SetupRoutes(server, ProductController)
 
 	server.Run(":8080")
 }
