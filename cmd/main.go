@@ -2,7 +2,7 @@ package main
 
 import (
 	"go-rest-api/controllers"
-	"go-rest-api/db"
+	"go-rest-api/database"
 	"go-rest-api/repositories"
 	"go-rest-api/routes"
 	"go-rest-api/usecases"
