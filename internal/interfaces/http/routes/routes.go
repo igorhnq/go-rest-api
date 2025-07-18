@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"go-rest-api/controllers"
+	"go-rest-api/internal/interfaces/http/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(router *gin.Engine, productController controllers.ProductController) {
-	SetupProductRoutes(router, productController)
+func SetupRoutes(router *gin.Engine, productHandler handlers.ProductHandler) {
+	SetupProductRoutes(router, productHandler)
 }

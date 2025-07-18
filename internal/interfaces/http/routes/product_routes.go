@@ -1,18 +1,18 @@
 package routes
 
 import (
-	"go-rest-api/controllers"
+	"go-rest-api/internal/interfaces/http/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupProductRoutes(router *gin.Engine, productController controllers.ProductController) {
+func SetupProductRoutes(router *gin.Engine, productHandler handlers.ProductHandler) {
 	products := router.Group("/products")
 	{
-		products.GET("", productController.GetProducts)
-		products.POST("", productController.CreateProduct)
-		products.GET("/:cdproduct", productController.GetProductById)
-		products.PUT("/:cdproduct", productController.UpdateProduct)
-		products.DELETE("/:cdproduct", productController.DeleteProductById)
+		products.GET("", productHandler.GetProducts)
+		products.POST("", productHandler.CreateProduct)
+		products.GET("/:cdproduct", productHandler.GetProductById)
+		products.PUT("/:cdproduct", productHandler.UpdateProduct)
+		products.DELETE("/:cdproduct", productHandler.DeleteProductById)
 	}
 }

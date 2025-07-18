@@ -1,8 +1,8 @@
-package usecases
+package product
 
 import (
-	"go-rest-api/models"
-	"go-rest-api/repositories"
+	"go-rest-api/internal/domain/entities"
+	"go-rest-api/internal/domain/repositories"
 )
 
 type ProductUsecase struct {
@@ -15,15 +15,15 @@ func NewProductUseCase(repository repositories.ProductRepository) ProductUsecase
 	}
 }
 
-func (pu *ProductUsecase) GetProducts() ([]models.Product, error) {
+func (pu *ProductUsecase) GetProducts() ([]entities.Product, error) {
 	return pu.repository.GetProducts()
 }
 
-func (pu *ProductUsecase) CreateProduct(product models.Product) (models.Product, error) {
+func (pu *ProductUsecase) CreateProduct(product entities.Product) (entities.Product, error) {
 
 	productId, err := pu.repository.CreateProduct(product)
 	if err != nil {
-		return models.Product{}, err
+		return entities.Product{}, err
 	}
 
 	product.ID = productId
@@ -31,7 +31,7 @@ func (pu *ProductUsecase) CreateProduct(product models.Product) (models.Product,
 	return product, nil
 }
 
-func (pu *ProductUsecase) GetProductById(cdproduct int) (*models.Product, error) {
+func (pu *ProductUsecase) GetProductById(cdproduct int) (*entities.Product, error) {
 	product, err := pu.repository.GetProductById(cdproduct)
 
 	if err != nil {
@@ -45,6 +45,6 @@ func (pu *ProductUsecase) DeleteProductById(cdproduct int) error {
 	return pu.repository.DeleteProductById(cdproduct)
 }
 
-func (pu *ProductUsecase) UpdateProduct(cdproduct int, product models.Product) error {
+func (pu *ProductUsecase) UpdateProduct(cdproduct int, product entities.Product) error {
 	return pu.repository.UpdateProduct(cdproduct, product)
 }

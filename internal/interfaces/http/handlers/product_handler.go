@@ -1,60 +1,59 @@
-package controllers
+package handlers
 
 import (
-	"go-rest-api/models"
-	"go-rest-api/usecases"
+	"go-rest-api/internal/domain/entities"
+	"go-rest-api/internal/usecases/product"
+	"go-rest-api/pkg/response"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type ProductController struct {
-	productUseCase usecases.ProductUsecase
+type ProductHandler struct {
+	productUseCase product.ProductUsecase
 }
 
-func NewProductController(usecases usecases.ProductUsecase) ProductController {
-	return ProductController{
-		productUseCase: usecases,
+func NewProductHandler(usecase product.ProductUsecase) ProductHandler {
+	return ProductHandler{
+		productUseCase: usecase,
 	}
 }
 
-func (p *ProductController) GetProducts(ctx *gin.Context) {
-
+func (p *ProductHandler) GetProducts(ctx *gin.Context) {
 	products, err := p.productUseCase.GetProducts()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, products)
 }
 
-func (p *ProductController) CreateProduct(ctx *gin.Context) {
-
-	var product models.Product
+func (p *ProductHandler) CreateProduct(ctx *gin.Context) {
+	var product entities.Product
 	err := ctx.BindJSON(&product)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	insertedProduct, err := p.productUseCase.CreateProduct(product)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, insertedProduct)
 }
 
-func (p *ProductController) GetProductById(ctx *gin.Context) {
-
+func (p *ProductHandler) GetProductById(ctx *gin.Context) {
 	id := ctx.Param("cdproduct")
 
 	if id == "" {
-		response := models.Response{
+		response := response.Response{
 			Message: "ID is required",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
@@ -63,7 +62,7 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 
 	productId, err := strconv.Atoi(id)
 	if err != nil {
-		response := models.Response{
+		response := response.Response{
 			Message: "Invalid ID, must be a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
@@ -72,12 +71,12 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 
 	product, err := p.productUseCase.GetProductById(productId)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	if product == nil {
-		response := models.Response{
+		response := response.Response{
 			Message: "Product not found",
 		}
 		ctx.JSON(http.StatusNotFound, response)
@@ -87,11 +86,11 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, product)
 }
 
-func (p *ProductController) DeleteProductById(ctx *gin.Context) {
+func (p *ProductHandler) DeleteProductById(ctx *gin.Context) {
 	id := ctx.Param("cdproduct")
 
 	if id == "" {
-		response := models.Response{
+		response := response.Response{
 			Message: "ID is required",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
@@ -100,7 +99,7 @@ func (p *ProductController) DeleteProductById(ctx *gin.Context) {
 
 	productId, err := strconv.Atoi(id)
 	if err != nil {
-		response := models.Response{
+		response := response.Response{
 			Message: "Invalid ID, must be a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
@@ -109,21 +108,21 @@ func (p *ProductController) DeleteProductById(ctx *gin.Context) {
 
 	err = p.productUseCase.DeleteProductById(productId)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	response := models.Response{
+	response := response.Response{
 		Message: "Product deleted successfully",
 	}
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (p *ProductController) UpdateProduct(ctx *gin.Context) {
+func (p *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	id := ctx.Param("cdproduct")
 
 	if id == "" {
-		response := models.Response{
+		response := response.Response{
 			Message: "ID is required",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
@@ -132,27 +131,27 @@ func (p *ProductController) UpdateProduct(ctx *gin.Context) {
 
 	productId, err := strconv.Atoi(id)
 	if err != nil {
-		response := models.Response{
+		response := response.Response{
 			Message: "Invalid ID, must be a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	var product models.Product
+	var product entities.Product
 	err = ctx.BindJSON(&product)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err = p.productUseCase.UpdateProduct(productId, product)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	response := models.Response{
+	response := response.Response{
 		Message: "Product updated successfully",
 	}
 	ctx.JSON(http.StatusOK, response)

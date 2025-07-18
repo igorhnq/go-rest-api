@@ -3,7 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"go-rest-api/models"
+	"go-rest-api/internal/domain/entities"
 )
 
 type ProductRepository struct {
@@ -16,16 +16,16 @@ func NewProductRepository(connection *sql.DB) ProductRepository {
 	}
 }
 
-func (p *ProductRepository) GetProducts() ([]models.Product, error) {
+func (p *ProductRepository) GetProducts() ([]entities.Product, error) {
 	query := "SELECT * FROM products"
 	rows, err := p.connection.Query(query)
 	if err != nil {
 		fmt.Println("Error querying products: ", err)
-		return []models.Product{}, err
+		return []entities.Product{}, err
 	}
 
-	var productList []models.Product
-	var productObj models.Product
+	var productList []entities.Product
+	var productObj entities.Product
 
 	for rows.Next() {
 		err = rows.Scan(
@@ -34,7 +34,7 @@ func (p *ProductRepository) GetProducts() ([]models.Product, error) {
 			&productObj.Price)
 		if err != nil {
 			fmt.Println("Error scanning product: ", err)
-			return []models.Product{}, err
+			return []entities.Product{}, err
 		}
 
 		productList = append(productList, productObj)
@@ -44,7 +44,7 @@ func (p *ProductRepository) GetProducts() ([]models.Product, error) {
 	return productList, nil
 }
 
-func (pr *ProductRepository) CreateProduct(product models.Product) (int, error) {
+func (pr *ProductRepository) CreateProduct(product entities.Product) (int, error) {
 
 	var id int
 	query, err := pr.connection.Prepare("INSERT INTO products" +
@@ -64,7 +64,7 @@ func (pr *ProductRepository) CreateProduct(product models.Product) (int, error) 
 	return id, nil
 }
 
-func (pr *ProductRepository) GetProductById(cdproduct int) (*models.Product, error) {
+func (pr *ProductRepository) GetProductById(cdproduct int) (*entities.Product, error) {
 
 	query, err := pr.connection.Prepare("SELECT * FROM products WHERE cdproduct = $1")
 	if err != nil {
@@ -72,7 +72,7 @@ func (pr *ProductRepository) GetProductById(cdproduct int) (*models.Product, err
 		return nil, err
 	}
 
-	var product models.Product
+	var product entities.Product
 
 	err = query.QueryRow(cdproduct).Scan(
 		&product.ID,
@@ -119,7 +119,7 @@ func (pr *ProductRepository) DeleteProductById(cdproduct int) error {
 	return nil
 }
 
-func (pr *ProductRepository) UpdateProduct(cdproduct int, product models.Product) error {
+func (pr *ProductRepository) UpdateProduct(cdproduct int, product entities.Product) error {
 	query, err := pr.connection.Prepare("UPDATE products SET nmproduct = $1, vlprice = $2 WHERE cdproduct = $3")
 	if err != nil {
 		fmt.Println("Error preparing update product: ", err)
